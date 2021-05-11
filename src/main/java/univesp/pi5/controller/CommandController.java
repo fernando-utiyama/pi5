@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,10 +40,10 @@ public class CommandController {
 
     @GetMapping("/response")
     public ResponseEntity<RequisicaoEntity> postResponse(@RequestParam(name = "id") Long id,
-                                                         @RequestParam(name = "peso") Float response,
+                                                         @RequestBody RequisicaoDTO requisicaoDTO,
                                                          UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = requestsJpaRepository.findById(id).orElseThrow(RuntimeException::new);
-        entity.setPeso(response);
+        entity.setPeso(requisicaoDTO.getPeso());
 
         requestsJpaRepository.save(entity);
 
