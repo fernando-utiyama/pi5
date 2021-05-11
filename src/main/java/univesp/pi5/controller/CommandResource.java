@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping
 @Slf4j
-public class CommandController {
+public class CommandResource {
 
     @Autowired
     private RequestsJpaRepository requestsJpaRepository;
