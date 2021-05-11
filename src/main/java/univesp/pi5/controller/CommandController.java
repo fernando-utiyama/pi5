@@ -23,7 +23,7 @@ import java.util.List;
 public class CommandController {
 
     @Autowired
-    RequestsJpaRepository requestsJpaRepository;
+    private RequestsJpaRepository requestsJpaRepository;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/command")
