@@ -4,18 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class RequisicaoDTO {
+public class Medidas {
 
     @JsonProperty
-    Long id;
+    double volume1;
 
     @JsonProperty
-    String command;
+    double peso1;
 
     @JsonProperty
-    String medidas;
+    double volume2;
 
     @JsonProperty
-    String status;
+    double peso2;
 
 }

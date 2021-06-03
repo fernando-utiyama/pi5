@@ -1,6 +1,7 @@
 package univesp.pi5.repository;
 
 import lombok.Data;
+import univesp.pi5.controller.Medidas;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +24,19 @@ public class RequisicaoEntity {
     private String command;
 
     @Column
-    private Float peso;
+    private String medidas;
+
+    @Column
+    private double volume1;
+
+    @Column
+    private double peso1;
+
+    @Column
+    private double volume2;
+
+    @Column
+    private double peso2;
 
 //    @Column
 //    private String status;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
 
+import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.util.List;
 
@@ -38,12 +40,18 @@ public class CommandResource {
         return ResponseEntity.created(uri).body(entity);
     }
 
-    @GetMapping("/response")
+    @PostMapping("/response")
     public ResponseEntity<RequisicaoEntity> postResponse(@RequestParam(name = "id") Long id,
                                                          @RequestBody RequisicaoDTO requisicaoDTO,
                                                          UriComponentsBuilder uriBuilder) {
-        RequisicaoEntity entity = requestsJpaRepository.findById(id).orElseThrow(RuntimeException::new);
-        entity.setPeso(requisicaoDTO.getPeso());
+        RequisicaoEntity entity = requestsJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+//        Medidas medidas = requisicaoDTO.getMedidas();
+//        entity.setVolume1(medidas.getVolume1());
+//        entity.setVolume2(medidas.getVolume2());
+//        entity.setPeso1(medidas.getPeso1());
+//        entity.setPeso2(medidas.getPeso2());
+
+        entity.setMedidas(requisicaoDTO.getMedidas());
 
         requestsJpaRepository.save(entity);
 
