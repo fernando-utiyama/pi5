@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
+import univesp.pi5.repository.Status;
 
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
@@ -33,6 +34,7 @@ public class CommandResource {
                                                            UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = new RequisicaoEntity();
         entity.setCommand(command);
+        entity.setStatus(Status.WAITING);
 
         requestsJpaRepository.save(entity);
 
@@ -52,6 +54,7 @@ public class CommandResource {
 //        entity.setPeso2(medidas.getPeso2());
 
         entity.setMedidas(requisicaoDTO.getMedidas());
+        entity.setStatus(Enum.valueOf(Status.class, requisicaoDTO.getStatus()));
 
         requestsJpaRepository.save(entity);
 
@@ -62,6 +65,12 @@ public class CommandResource {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
     public List<RequisicaoEntity> getRequests() {
+        return requestsJpaRepository.findAll();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/allrequests")
+    public List<RequisicaoEntity> getAllRequests() {
         return requestsJpaRepository.findAll();
     }
 
