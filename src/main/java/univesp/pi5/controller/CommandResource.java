@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+import univesp.pi5.repository.ArduinoStatus;
 import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
-import univesp.pi5.repository.Status;
 
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping
@@ -34,7 +36,7 @@ public class CommandResource {
                                                            UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = new RequisicaoEntity();
         entity.setCommand(command);
-        entity.setStatus(Status.WAITING);
+        entity.setArduinoStatus(ArduinoStatus.WAITING);
 
         requestsJpaRepository.save(entity);
 
@@ -54,7 +56,7 @@ public class CommandResource {
 //        entity.setPeso2(medidas.getPeso2());
 
         entity.setMedidas(requisicaoDTO.getMedidas());
-        entity.setStatus(Enum.valueOf(Status.class, requisicaoDTO.getStatus()));
+        entity.setArduinoStatus(Enum.valueOf(ArduinoStatus.class, requisicaoDTO.getStatus()));
 
         requestsJpaRepository.save(entity);
 
@@ -65,7 +67,8 @@ public class CommandResource {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
     public List<RequisicaoEntity> getRequests() {
-        return requestsJpaRepository.findAll();
+        List<RequisicaoEntity> requests = requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.WAITING);
+        return Stream.concat(requests.stream(), requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.WAITING).stream()).collect(Collectors.toList());
     }
 
     @ResponseStatus(HttpStatus.OK)

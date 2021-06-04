@@ -40,6 +40,6 @@ public class RequisicaoEntity {
     private double peso2;
 
     @Enumerated(EnumType.ORDINAL)
-    private Status status;
+    private ArduinoStatus arduinoStatus;
 
 }

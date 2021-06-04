@@ -1,11 +1,13 @@
 package univesp.pi5.repository;
 
-public enum Status {
+public enum ArduinoStatus {
 
     FINISHED,
 
+    RUNNING,
+
     WAITING,
 
-    DOING
+    ERROR
 
 }
