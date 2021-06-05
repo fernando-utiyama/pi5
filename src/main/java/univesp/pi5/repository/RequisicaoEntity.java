@@ -31,18 +31,6 @@ public class RequisicaoEntity {
     @Column
     private String medidas;
 
-    @Column
-    private double volume1;
-
-    @Column
-    private double peso1;
-
-    @Column
-    private double volume2;
-
-    @Column
-    private double peso2;
-
     @Enumerated(EnumType.ORDINAL)
     private ArduinoStatus arduinoStatus;
 
