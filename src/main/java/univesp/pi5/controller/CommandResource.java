@@ -18,6 +18,7 @@ import univesp.pi5.repository.RequisicaoEntity;
 
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ public class CommandResource {
     public ResponseEntity<RequisicaoEntity> receiveCommand(@RequestParam(name = "command") String command,
                                                            UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = new RequisicaoEntity();
+        entity.setDateTime(LocalDateTime.now());
         entity.setCommand(command);
         entity.setArduinoStatus(ArduinoStatus.WAITING);
 
