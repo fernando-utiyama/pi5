@@ -32,7 +32,7 @@ public class CommandResource {
     private RequestsJpaRepository requestsJpaRepository;
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/command")
+    @PostMapping("/command")
     public ResponseEntity<RequisicaoEntity> receiveCommand(@RequestParam(name = "command") String command,
                                                            UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = new RequisicaoEntity();
@@ -70,7 +70,7 @@ public class CommandResource {
     @GetMapping("/requests")
     public List<RequisicaoEntity> getRequests() {
         List<RequisicaoEntity> requests = requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.WAITING);
-        return Stream.concat(requests.stream(), requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.WAITING).stream()).collect(Collectors.toList());
+        return Stream.concat(requests.stream(), requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.ERROR).stream()).collect(Collectors.toList());
     }
 
     @ResponseStatus(HttpStatus.OK)
