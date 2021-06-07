@@ -16,6 +16,7 @@ import univesp.pi5.repository.ArduinoStatus;
 import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -24,12 +25,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api")
 @Slf4j
 public class CommandResource {
 
     @Autowired
     private RequestsJpaRepository requestsJpaRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/command")
@@ -46,16 +50,43 @@ public class CommandResource {
         return ResponseEntity.created(uri).body(entity);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/request")
+    public ResponseEntity<RequisicaoEntity> receiveRequest(@RequestBody RequisicaoDTO requisicaoDTO,
+                                                           UriComponentsBuilder uriBuilder) {
+        RequisicaoEntity entity = new RequisicaoEntity();
+        entity.setDateTime(LocalDateTime.now());
+        entity.setCommand(requisicaoDTO.getCommand());
+        entity.setArduinoStatus(ArduinoStatus.WAITING);
+        requestsJpaRepository.save(entity);
+
+        if (requisicaoDTO.getCommand() == null || requisicaoDTO.getCommand().equals("0000")) {
+            entity.setArduinoStatus(ArduinoStatus.FINISHED);
+            entity.setMedidas("Nenhuma medida realizada!");
+            requestsJpaRepository.save(entity);
+        } else {
+            int count = 0;
+            while ((entity.getArduinoStatus().compareTo(ArduinoStatus.FINISHED) != 0 &&
+                    entity.getArduinoStatus().compareTo(ArduinoStatus.ERROR) != 0) || count >= 60) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.info(e.getMessage());
+                }
+                entityManager.clear();
+                entity = requestsJpaRepository.findById(entity.getId()).orElseThrow(RuntimeException::new);
+                count++;
+            }
+        }
+        URI uri = uriBuilder.path("/command/{id}").buildAndExpand(entity.getId()).toUri();
+        return ResponseEntity.created(uri).body(entity);
+    }
+
     @PostMapping("/response")
     public ResponseEntity<RequisicaoEntity> postResponse(@RequestParam(name = "id") Long id,
                                                          @RequestBody RequisicaoDTO requisicaoDTO,
                                                          UriComponentsBuilder uriBuilder) {
         RequisicaoEntity entity = requestsJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-//        Medidas medidas = requisicaoDTO.getMedidas();
-//        entity.setVolume1(medidas.getVolume1());
-//        entity.setVolume2(medidas.getVolume2());
-//        entity.setPeso1(medidas.getPeso1());
-//        entity.setPeso2(medidas.getPeso2());
 
         entity.setMedidas(requisicaoDTO.getMedidas());
         entity.setArduinoStatus(Enum.valueOf(ArduinoStatus.class, requisicaoDTO.getStatus()));
