@@ -67,7 +67,7 @@ public class CommandResource {
         } else {
             int count = 0;
             while ((entity.getArduinoStatus().compareTo(ArduinoStatus.FINISHED) != 0 &&
-                    entity.getArduinoStatus().compareTo(ArduinoStatus.ERROR) != 0) || count >= 60) {
+                    entity.getArduinoStatus().compareTo(ArduinoStatus.ERROR) != 0) || count >= 100) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
