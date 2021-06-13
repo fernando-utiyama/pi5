@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@CrossOrigin(origins = "http://univesp-campinas-pi5-ui.herokuapp.com")
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
 @Slf4j
