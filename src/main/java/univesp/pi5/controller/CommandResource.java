@@ -15,11 +15,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import univesp.pi5.repository.ArduinoStatus;
 import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
+import univesp.pi5.service.Rotina;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,17 +35,17 @@ public class CommandResource {
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private Rotina rotina;
+
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/command")
     public ResponseEntity<RequisicaoEntity> receiveCommand(@RequestParam(name = "command") String command,
                                                            UriComponentsBuilder uriBuilder) {
-        RequisicaoEntity entity = new RequisicaoEntity();
-        entity.setDateTime(LocalDateTime.now());
-        entity.setCommand(command);
-        entity.setArduinoStatus(ArduinoStatus.WAITING);
+        RequisicaoDTO requisicaoDTO = new RequisicaoDTO();
+        requisicaoDTO.setCommand(command);
 
-        requestsJpaRepository.save(entity);
-
+        RequisicaoEntity entity = rotina.executa(requisicaoDTO);
         URI uri = uriBuilder.path("/command/{id}").buildAndExpand(entity.getId()).toUri();
         return ResponseEntity.created(uri).body(entity);
     }
@@ -54,30 +54,7 @@ public class CommandResource {
     @PostMapping("/request")
     public ResponseEntity<RequisicaoEntity> receiveRequest(@RequestBody RequisicaoDTO requisicaoDTO,
                                                            UriComponentsBuilder uriBuilder) {
-        RequisicaoEntity entity = new RequisicaoEntity();
-        entity.setDateTime(LocalDateTime.now());
-        entity.setCommand(requisicaoDTO.getCommand());
-        entity.setArduinoStatus(ArduinoStatus.WAITING);
-        requestsJpaRepository.save(entity);
-
-        if (requisicaoDTO.getCommand() == null || requisicaoDTO.getCommand().equals("0000")) {
-            entity.setArduinoStatus(ArduinoStatus.FINISHED);
-            entity.setMedidas("Nenhuma medida realizada!");
-            requestsJpaRepository.save(entity);
-        } else {
-            int count = 0;
-            while ((entity.getArduinoStatus().compareTo(ArduinoStatus.FINISHED) != 0 &&
-                    entity.getArduinoStatus().compareTo(ArduinoStatus.ERROR) != 0) || count >= 200) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.info(e.getMessage());
-                }
-                entityManager.clear();
-                entity = requestsJpaRepository.findById(entity.getId()).orElseThrow(RuntimeException::new);
-                count++;
-            }
-        }
+        RequisicaoEntity entity = rotina.executa(requisicaoDTO);
         URI uri = uriBuilder.path("/command/{id}").buildAndExpand(entity.getId()).toUri();
         return ResponseEntity.created(uri).body(entity);
     }
