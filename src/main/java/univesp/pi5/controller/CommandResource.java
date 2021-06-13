@@ -41,6 +41,7 @@ public class CommandResource {
     @Autowired
     private EntityManager entityManager;
 
+    @Transactional(timeout = 60000)
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/command")
     public ResponseEntity<RequisicaoEntity> receiveCommand(@RequestParam(name = "command") String command,
@@ -53,7 +54,6 @@ public class CommandResource {
         return ResponseEntity.created(uri).body(entity);
     }
 
-    @Transactional(timeout = 60000)
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/request")
     public ResponseEntity<RequisicaoEntity> receiveRequest(@RequestBody RequisicaoDTO requisicaoDTO,
