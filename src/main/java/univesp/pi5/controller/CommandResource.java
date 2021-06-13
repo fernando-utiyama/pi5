@@ -17,7 +17,6 @@ import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
 import univesp.pi5.service.Rotina;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.util.List;
@@ -31,9 +30,6 @@ public class CommandResource {
 
     @Autowired
     private RequestsJpaRepository requestsJpaRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private Rotina rotina;
