@@ -17,6 +17,7 @@ import univesp.pi5.repository.RequestsJpaRepository;
 import univesp.pi5.repository.RequisicaoEntity;
 import univesp.pi5.service.Rotina;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import java.net.URI;
 import java.util.List;
@@ -33,6 +34,9 @@ public class CommandResource {
 
     @Autowired
     private Rotina rotina;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/command")
@@ -59,6 +63,7 @@ public class CommandResource {
     public ResponseEntity<RequisicaoEntity> postResponse(@RequestParam(name = "id") Long id,
                                                          @RequestBody RequisicaoDTO requisicaoDTO,
                                                          UriComponentsBuilder uriBuilder) {
+        entityManager.clear();
         RequisicaoEntity entity = requestsJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         entity.setMedidas(requisicaoDTO.getMedidas());
