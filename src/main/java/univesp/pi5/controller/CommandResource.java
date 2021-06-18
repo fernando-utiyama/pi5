@@ -41,22 +41,24 @@ public class CommandResource {
     @Autowired
     private EntityManager entityManager;
 
+    //Receber o comando String
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/command")
     public ResponseEntity<RequisicaoEntity> receiveCommand(@RequestParam(name = "command") String command,
                                                            UriComponentsBuilder uriBuilder) {
-
         RequisicaoEntity entity = new RequisicaoEntity();
         entity.setDateTime(LocalDateTime.now());
         entity.setCommand(command);
         entity.setArduinoStatus(ArduinoStatus.WAITING);
-        requestsJpaRepository.save(entity);
 
-//        RequisicaoEntity entity = rotina.executa(requisicaoDTO);
+        requestsJpaRepository.save(entity);
+        log.info("Comando recebido: " + command);
+
         URI uri = uriBuilder.path("/request/{id}").buildAndExpand(entity.getId()).toUri();
         return ResponseEntity.created(uri).body(entity);
     }
 
+    //Receber o comando JSON
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/request")
     public ResponseEntity<RequisicaoEntity> receiveRequest(@RequestBody RequisicaoDTO requisicaoDTO,
@@ -65,12 +67,15 @@ public class CommandResource {
         entity.setDateTime(LocalDateTime.now());
         entity.setCommand(requisicaoDTO.getCommand());
         entity.setArduinoStatus(ArduinoStatus.WAITING);
+
         requestsJpaRepository.save(entity);
-//        RequisicaoEntity entity = rotina.executa(requisicaoDTO);
+        log.info("Comando recebido: " + requisicaoDTO.getCommand());
+
         URI uri = uriBuilder.path("/command/{id}").buildAndExpand(entity.getId()).toUri();
         return ResponseEntity.created(uri).body(entity);
     }
 
+    //Atualiza a requisição
     @PostMapping("/response")
     public ResponseEntity<RequisicaoEntity> postResponse(@RequestParam(name = "id") Long id,
                                                          @RequestBody RequisicaoDTO requisicaoDTO,
@@ -82,11 +87,15 @@ public class CommandResource {
         entity.setArduinoStatus(Enum.valueOf(ArduinoStatus.class, requisicaoDTO.getStatus()));
 
         requestsJpaRepository.save(entity);
+        if (requisicaoDTO.getMedidas() != null) {
+            log.info("Medida recebida: " + entity);
+        }
 
         URI uri = uriBuilder.path("/response/{id}").buildAndExpand(entity.getId()).toUri();
         return ResponseEntity.created(uri).body(entity);
     }
 
+    //Envio de List de requisições com status WAITING e ERROR
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
     public List<RequisicaoEntity> getRequests() {
@@ -94,6 +103,7 @@ public class CommandResource {
         return Stream.concat(requests.stream(), requestsJpaRepository.findAllByArduinoStatus(ArduinoStatus.ERROR).stream()).collect(Collectors.toList());
     }
 
+    //Envio da requisição pelo id
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/request")
     public RequisicaoEntity getRequest(@RequestParam(name = "id") Long id) {
@@ -101,12 +111,15 @@ public class CommandResource {
         return requestsJpaRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
+    //Envia a lista de todas as requisições
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/allrequests")
     public List<RequisicaoEntity> getAllRequests() {
         return requestsJpaRepository.findAll();
     }
 
+
+    //Deleta todas as requisições
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/clear")
     public void clear() {
