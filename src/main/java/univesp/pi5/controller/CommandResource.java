@@ -68,6 +68,11 @@ public class CommandResource {
         entity.setCommand(requisicaoDTO.getCommand());
         entity.setArduinoStatus(ArduinoStatus.WAITING);
 
+        if (requisicaoDTO.getCommand() == null || requisicaoDTO.getCommand().equals("0000")) {
+            entity.setArduinoStatus(ArduinoStatus.FINISHED);
+            entity.setMedidas("Nenhuma medida realizada!");
+        }
+
         requestsJpaRepository.save(entity);
         log.info("Comando recebido: " + requisicaoDTO.getCommand());
 
